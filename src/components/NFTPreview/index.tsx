@@ -61,7 +61,7 @@ const NFTPreview = ({
     <>
     <h2>{artist} # {tokenId}</h2>
     <div className="image_block">
-      {metadata.attributes.map((a: any) => (<button key={`${a.trait_type}`} style={{lineHeight: undefined}}><small>{a.trait_type}</small><br />{a.value}</button>))}
+      {metadata.attributes.map((a: any) => (<button key={`${a.trait_type}`} style={{lineHeight: 'initial'}}><small>{a.trait_type}</small><br />{a.value}</button>))}
     </div>
     <div className="image_block">
     {BACKGROUNDS.map((bg) => {
