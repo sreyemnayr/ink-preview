@@ -60,7 +60,9 @@ export default function Home() {
 
   useEffect(() => {
     console.log(nftData);
-    window.localStorage.setItem("editions", JSON.stringify(nftData));
+    if(JSON.stringify(nftData) != JSON.stringify(data)){
+      window.localStorage.setItem("editions", JSON.stringify(nftData));
+    }
 
     setStats(Object.values(nftData).reduce((accum: any, x) => {
       accum.tiers[x._tier] = accum.tiers[x._tier] ? accum.tiers[x._tier] + 1 : 1;
