@@ -1,6 +1,7 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "@/lib/mongodb";
 
-export const editions = async (req, res) => {
+export const editions = async (req: NextApiRequest, res: NextApiResponse) => {
    try {
        const client = await clientPromise;
        const db = client.db("order-of-ink");
