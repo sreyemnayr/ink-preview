@@ -21,6 +21,10 @@ const TIERS = [
   'Black'
 ]
 
+const updateToken = ({tid, data}: {tid: string, data: any}) => {
+  return fetch(`/api/editions/${tid}`, {method: 'POST', body: JSON.stringify(data)}).then((res) => res.json());
+}
+
 export interface INFTPreviewProps {
   tokenId: string;
   artist: string;
@@ -59,11 +63,15 @@ const NFTPreview = ({
 
   return (
     <>
-    <h2>{artist} # {tokenId}</h2>
-    <div className="image_block">
+    <h2 key={`h2_${tokenId}`}>{artist} # {tokenId}
+    <button onClick={()=>{
+      updateToken({tid: tokenId, data: {_background: bgSelected, _foreground: fgSelected, _title: titleSelected, _tier: tierSelected}})
+    }}>Save</button>
+    </h2>
+    <div key={`div1_${tokenId}`} className="image_block">
       {metadata.attributes.map((a: any) => (<button key={`${a.trait_type}`} style={{lineHeight: 'initial'}}><small>{a.trait_type}</small><br />{a.value}</button>))}
     </div>
-    <div className="image_block">
+    <div key={`div2_${tokenId}`} className="image_block">
     {BACKGROUNDS.map((bg) => {
       return (
         FOREGROUNDS.map((fg) => {
@@ -81,6 +89,7 @@ const NFTPreview = ({
         })
       ) 
     })}
+    <button style={{height: '50px', width:'50px', padding:'0px 0px'}} onClick={()=>{setBgSelected(''); setFgSelected('')}}><small>Clear</small></button>
     </div>
     {(bgSelected != "" && fgSelected != "") && 
     <Image 
@@ -88,6 +97,7 @@ const NFTPreview = ({
     alt={`${tokenId}_${bgSelected}_${fgSelected}`} 
     width={500}
     height={500}
+    key={`img_${tokenId}`}
     />
   }
   {(bgSelected == "" && fgSelected == "") && false && 
@@ -96,38 +106,39 @@ const NFTPreview = ({
     alt={`${tokenId}_${bgSelected}_${fgSelected}`} 
     width={500}
     height={500}
+    key={`img_no_${tokenId}`}
     />
   }
-    <div className="image_block">
-    <label htmlFor="title">Title</label><input name="title" onChange={(e)=> {
+    <div key={`div3_${tokenId}`} className="image_block">
+    <label key={`label1_${tokenId}`} htmlFor="title">Title</label><input key={`input1_${tokenId}`} name="title" onChange={(e)=> {
       setTitle(e.target.value);
     }} value={title} />
-    <label htmlFor="tier">Tier</label>
-    <select name="tier" onChange={(e) => {
+    <label key={`label2_${tokenId}`} htmlFor="tier">Tier</label>
+    <select  key={`select2_${tokenId}`} name="tier" onChange={(e) => {
       setTier(e.target.value);
     }}>
-      <option value="Gold" selected={tierSelected == "Gold"}>Gold</option>
-      <option value="Silver" selected={tierSelected == "Silver"}>Silver</option>
-      <option value="Black" selected={tierSelected == "Black"}>Black</option>
-      <option value="" selected={tierSelected == ""}></option>
+      <option key={`option2_1_${tokenId}`} value="Gold" selected={tierSelected == "Gold"}>Gold</option>
+      <option key={`option2_2_${tokenId}`} value="Silver" selected={tierSelected == "Silver"}>Silver</option>
+      <option key={`option2_3_${tokenId}`} value="Black" selected={tierSelected == "Black"}>Black</option>
+      <option key={`option2_4_${tokenId}`} value="" selected={tierSelected == ""}></option>
     </select>
-    <label htmlFor="foreground">Foreground</label>
-    <select name="foreground" onChange={(e) => {
+    <label key={`label3_${tokenId}`} htmlFor="foreground">Foreground</label>
+    <select key={`select3_${tokenId}`} name="foreground" onChange={(e) => {
       setFgSelected(e.target.value);
     }}>
-      <option value="white" selected={fgSelected == "white"}>white</option>
-      <option value="black" selected={fgSelected == "black"}>black</option>
-      <option value="" selected={fgSelected == ""}></option>
+      <option key={`option3_1_${tokenId}`} value="white" selected={fgSelected == "white"}>white</option>
+      <option key={`option3_2_${tokenId}`} value="black" selected={fgSelected == "black"}>black</option>
+      <option key={`option3_3_${tokenId}`} value="" selected={fgSelected == ""}></option>
     </select>
-    <label htmlFor="background">Background</label>
-    <select name="background" onChange={(e) => {
+    <label key={`label4_${tokenId}`} htmlFor="background">Background</label>
+    <select key={`select4_${tokenId}`} name="background" onChange={(e) => {
       setBgSelected(e.target.value);
     }}>
-      <option value="fire" selected={bgSelected == "fire"}>fire</option>
-      <option value="water" selected={bgSelected == "water"}>water</option>
-      <option value="earth" selected={bgSelected == "earth"}>earth</option>
-      <option value="clouds" selected={bgSelected == "clouds"}>clouds</option>
-      <option value="" selected={bgSelected == ""}></option>
+      <option key={`option4_1_${tokenId}`} value="fire" selected={bgSelected == "fire"}>fire</option>
+      <option key={`option4_2_${tokenId}`} value="water" selected={bgSelected == "water"}>water</option>
+      <option key={`option4_3_${tokenId}`} value="earth" selected={bgSelected == "earth"}>earth</option>
+      <option key={`option4_4_${tokenId}`} value="clouds" selected={bgSelected == "clouds"}>clouds</option>
+      <option key={`option4_5_${tokenId}`} value="" selected={bgSelected == ""}></option>
     </select>
     </div>
     
