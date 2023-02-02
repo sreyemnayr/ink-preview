@@ -14,7 +14,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import dataDefault from '@/data/editions.json'
 
-import NFTPreview from '@/components/NFTPreview'
+import NFTPreviewZoom from '@/components/NFTPreviewZoom'
 import { useSession, useSignOut } from "@randombits/use-siwe";
 
 import useSWR from 'swr'
@@ -65,6 +65,14 @@ export const getServerSideProps: GetServerSideProps = async context => {
   }
 }
 
+const zoomEmoji = (zoom: string) => {
+  switch (zoom){
+    case 'no': return '✅';
+    case 'yes': return '🔎';
+    default: return '❓'
+  }
+}
+
 const foregroundEmoji = (fg: string) => {
   switch (fg){
     case 'white': return '⬜';
@@ -104,6 +112,14 @@ const authorized = (address: string | undefined) => {
   }
 }
 
+const zoomOrNot = (zoom: string) => {
+  switch(zoom){
+    case '100': return 'no';
+    case '': return '';
+    default: return 'yes';
+  }
+}
+
 
 export default function Home({
   isConnected
@@ -118,7 +134,12 @@ export default function Home({
 
   const [viewIndex, setViewIndex] = useState(['1'])
 
-  const [stats, setStats] = useState({tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}})
+  const [stats, setStats] = useState({
+    zooms: {'': 0, 'no': 0, 'yes': 0},
+    tiers: {Gold: 0, Silver: 0, Black: 0},
+    backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0},
+    foregrounds: {white: 0, black: 0}
+  })
 
   const { isLoading, authenticated, address } = useSession();
 
@@ -130,11 +151,12 @@ export default function Home({
     console.log(data);
     if(nftData){
       setStats(nftData.reduce((accum: any, x) => {
+        accum.zooms[zoomOrNot(x?._zoom || '')] = accum.zooms[zoomOrNot(x?._zoom || '')] ? accum.zooms[zoomOrNot(x?._zoom || '')] + 1 : 1;
         accum.tiers[x._tier] = accum.tiers[x._tier] ? accum.tiers[x._tier] + 1 : 1;
         accum.backgrounds[x._background] = accum.backgrounds[x._background] ? accum.backgrounds[x._background] + 1 : 1;
         accum.foregrounds[x._foreground] = accum.foregrounds[x._foreground] ? accum.foregrounds[x._foreground] + 1 : 1;
         return accum;
-      }, {tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
+      }, {zooms: {'': 0, 'no': 0, 'yes': 0}, tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
     }
   }, [nftData, data]);
 
@@ -151,7 +173,7 @@ export default function Home({
 
   useEffect(() => {
     if(viewIndex.length > 0 && nftData.length > 0 && !initialized){
-    setInView(viewIndex.indexOf(nftData.find((d:any)=>(d._background == '' && d._foreground == ''))?._id || '') || 0)
+    setInView(viewIndex.indexOf(nftData.find((d:any)=>(d._zoom == ''))?._id || '') || 0)
     setInitialized(true)
     }
   }, [viewIndex, nftData, initialized])
@@ -173,7 +195,7 @@ export default function Home({
     
   }
 
-  const updateData = ({tid="", bg="", fg="", t="", tr=""}) => {
+  const updateData = ({tid="", zoom="", t="", tr=""}) => {
     setNftData(
       existingValues => (existingValues.map((ev) => {
           if (ev._id != tid){
@@ -181,8 +203,7 @@ export default function Home({
           } else {
             return {
               ...ev,
-              _foreground: fg,
-              _background: bg,
+              _zoom: zoom,
               _title: t,
               _tier: tr
             }
@@ -205,10 +226,10 @@ export default function Home({
           <>
           <div style={{textAlign: 'center'}}>
           <div style={{display: 'flex'}}>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>ZOOMS<br /> {Object.entries(stats.zooms).map(([t,n]) => (<span key={`temoji_${t}`}>{zoomEmoji(t)} {n} </span>))} <br /></div>
             <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TIERS<br /> {Object.entries(stats.tiers).map(([t,n]) => (<span key={`temoji_${t}`}>{tierEmoji(t)} {n} </span>))} <br /></div>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>BACKGROUNDS<br /> {Object.entries(stats.backgrounds).map(([t,n]) => (<span key={`bemoji_${t}`}>{backgroundEmoji(t)} {n} </span>))}<br /></div>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>FOREGROUNDS<br /> {Object.entries(stats.foregrounds).map(([t,n]) => (<span key={`femoji_${t}`}>{foregroundEmoji(t)} {n} </span>))}
-            </div>
+            {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>BACKGROUNDS<br /> {Object.entries(stats.backgrounds).map(([t,n]) => (<span key={`bemoji_${t}`}>{backgroundEmoji(t)} {n} </span>))}<br /></div> */}
+            {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>FOREGROUNDS<br /> {Object.entries(stats.foregrounds).map(([t,n]) => (<span key={`femoji_${t}`}>{foregroundEmoji(t)} {n} </span>))}</div> */}
           </div>
         </div>
         <div className="image_block">
@@ -217,7 +238,7 @@ export default function Home({
         }}>
           {nftData.map((info) => {
             return (
-              <option key={`opt_${info._id}`} value={info._id}>{info.artist} # {info._id} - {info._title} {tierEmoji(info._tier)}{backgroundEmoji(info._background)}{foregroundEmoji(info._foreground)}</option>
+              <option key={`opt_${info._id}`} value={info._id}>{info.artist} # {info._id} - {info._title} {tierEmoji(info._tier)}{backgroundEmoji(info._background)}{foregroundEmoji(info._foreground)}{zoomEmoji(zoomOrNot(info?._zoom || ''))}</option>
             )
           }) }
         </select>
@@ -230,18 +251,17 @@ export default function Home({
           isConnected && address && authorized(address) && nftData.filter((info) => info._id == viewIndex[inView]).map((info) => {
           return(
             <>
-            <NFTPreview 
+            <NFTPreviewZoom 
               title={info._title}
               tokenId={info._id}
               tier={info._tier}
               artist={info.artist}
-              background_selected={info._background}
-              foreground_selected={info._foreground}
+              zoom_selected={info?._zoom}
               metadata={info._metadata}
               key={`preview_${info._id}`}
-              handler={(tid: string, bg: string, fg: string, t: string, tr:string) => {
-              updateData({tid, bg, fg, t, tr})
-            }}></NFTPreview>
+              handler={(tid: string, zoom: string, t: string, tr:string) => {
+              updateData({tid, zoom, t, tr})
+            }}></NFTPreviewZoom>
             </>
           )
         })}
