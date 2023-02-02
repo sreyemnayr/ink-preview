@@ -67,12 +67,20 @@ const NFTPreviewZoom = ({
     {ZOOMS.map((zoom) => {
       
         return (
-        <div 
-          style={{width: '100px', height: '100px', backgroundImage: `url(/_next/image?url=http%3A%2F%2Fink-preview.s3-website.us-east-2.amazonaws.com%2Fpreviews%2${artist}_${tokenId}_${zoom}_percent.jpg&w=100&q=75)`, backgroundSize: 'cover'}} 
-          key={`${tokenId}_${zoom}`}
-          onClick={()=>{setZoomSelected(zoom);}}
-          className={(zoom == zoomSelected) ? 'selected' : ''}
-          >{zoom}%</div>
+          <div key={`${tokenId}_${zoom}`}>
+          <div style={{width: '100px', height: '100px', zIndex: -1, position: 'relative'}} onClick={()=>{setZoomSelected(zoom);}} className={(zoom == zoomSelected) ? 'selected' : ''}>
+          <Image 
+            src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${artist}_${tokenId}_${zoom}_percent.jpg`} 
+            
+            alt={`${tokenId}_${zoom}`} 
+            fill
+            style={{objectFit:"cover"}}
+          
+            
+            />
+          </div>
+          {zoom}%
+          </div>
         )
        
     })}
