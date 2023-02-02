@@ -173,7 +173,7 @@ export default function Home({
 
   useEffect(() => {
     if(viewIndex.length > 0 && nftData.length > 0 && !initialized){
-    setInView(viewIndex.indexOf(nftData.find((d:any)=>(d._zoom == ''))?._id || '') || 0)
+    setInView(viewIndex.indexOf(nftData.find((d:any)=>(d?._zoom == ''))?._id || '29') || 0)
     setInitialized(true)
     }
   }, [viewIndex, nftData, initialized])
