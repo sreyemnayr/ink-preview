@@ -10,7 +10,7 @@ const ZOOMS = [
   '85',
   '80',
   '75',
-  '70',
+  '70'
 ]
 
 const TIERS = [
@@ -67,15 +67,12 @@ const NFTPreviewZoom = ({
     {ZOOMS.map((zoom) => {
       
         return (
-        <Image 
-          src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${artist}_${tokenId}_${zoom}_percent.jpg`} 
+        <div 
+          style={{width: '100px', height: '100px', backgroundImage: `url(http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${artist}_${tokenId}_${zoom}_percent.jpg)`, backgroundSize: 'cover'}} 
           key={`${tokenId}_${zoom}`}
-          alt={`${tokenId}_${zoom}`} 
-          width={50}
-          height={50}
           onClick={()=>{setZoomSelected(zoom);}}
           className={(zoom == zoomSelected) ? 'selected' : ''}
-          />
+          >{zoom}%</div>
         )
        
     })}

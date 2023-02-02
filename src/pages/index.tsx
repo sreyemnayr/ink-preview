@@ -256,7 +256,7 @@ export default function Home({
               tokenId={info._id}
               tier={info._tier}
               artist={info.artist}
-              zoom_selected={info?._zoom}
+              zoom_selected={info?._zoom || ''}
               metadata={info._metadata}
               key={`preview_${info._id}`}
               handler={(tid: string, zoom: string, t: string, tr:string) => {
