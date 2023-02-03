@@ -43,7 +43,7 @@ const exportCSV = (exportData: { [key: string]: string | object | number | undef
     [headers, ...exportData.map((item: { [key: string]: string | object | number | undefined }) => {
       let i : Array<string> = []
       for(let h of headers){
-        i.push(typeof(item?.[h]) == 'object' || 'number' ? JSON.stringify(item?.[h]) : `${item?.[h] || ''}`)
+        i.push(typeof(item?.[h]) == 'object' || typeof(item?.[h]) == 'number' ? JSON.stringify(item?.[h]) : `${item?.[h] || ''}`)
       }
       return i.map(str => `"${str?.replace(/"/g, '\\"') || str}"`)
     })].map(e => e.join(",")).join("\r\n")
