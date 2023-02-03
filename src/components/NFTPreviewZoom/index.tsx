@@ -4,6 +4,8 @@ import Image from 'next/image'
 import handler from '@/pages/api/hello';
 
 const ZOOMS = [
+  '110',
+  '105',
   '100',
   '95',
   '90',
@@ -28,6 +30,7 @@ export interface INFTPreviewProps {
   artist: string;
   title: string;
   tier: string;
+  notes?: string;
   zoom_selected?: string;
   metadata?: any;
   handler: any;
@@ -38,26 +41,29 @@ const NFTPreviewZoom = ({
   artist,
   title,
   tier,
+  notes = "",
   zoom_selected,
   metadata,
   handler
 }: INFTPreviewProps) => {
   const [zoomSelected, setZoomSelected] = useState(zoom_selected);
+  const [notesSelected, setNotesSelected] = useState(notes);
   
   const [titleSelected, setTitle] = useState(title);
   const [tierSelected, setTier] = useState(tier); 
   
+  
   useEffect(() => {
-    if(zoom_selected != zoomSelected || title != titleSelected || tier != tierSelected){
-      handler(tokenId, zoomSelected, titleSelected, tierSelected);
+    if(zoom_selected != zoomSelected || title != titleSelected || tier != tierSelected || notes != notesSelected){
+      handler(tokenId, zoomSelected, notes, titleSelected, tierSelected);
     }
-  }, [zoom_selected, tier, tierSelected, title, titleSelected, tokenId, handler, zoomSelected])
+  }, [zoom_selected, tier, tierSelected, title, titleSelected, tokenId, handler, zoomSelected, notes, notesSelected])
 
   return (
     <>
     <h2 key={`h2_${tokenId}`}>{artist} # {tokenId}
     <button onClick={()=>{
-      updateToken({tid: tokenId, data: {_zoom: zoomSelected, _title: titleSelected, _tier: tierSelected}})
+      updateToken({tid: tokenId, data: {_zoom: zoomSelected, _notes: notesSelected, _title: titleSelected, _tier: tierSelected}})
     }}>Save</button>
     </h2>
     <div key={`div1_${tokenId}`} className="image_block">
@@ -124,6 +130,11 @@ const NFTPreviewZoom = ({
       <option key={`option4_7_${tokenId}`} value="70" selected={zoomSelected == "70"}>70%</option>
       <option key={`option4_8_${tokenId}`} value="" selected={zoomSelected == ""}>?</option>
     </select>
+    </div>
+    <div key={`div4_${tokenId}`} className="image_block">
+    <label key={`label5_${tokenId}`} htmlFor="notes">Notes</label><input key={`input5_${tokenId}`} name="notes" onChange={(e)=> {
+      setNotesSelected(e.target.value);
+    }} value={notesSelected} />
     </div>
     
     <hr />

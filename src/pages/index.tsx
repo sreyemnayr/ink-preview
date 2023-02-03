@@ -35,6 +35,27 @@ const exportData = (exportData: any) => {
   link.click();
 };
 
+const exportCSV = (exportData: { [key: string]: string | object | number | undefined }[]) => {
+
+  const headers: string[] = Array.from(new Set( exportData.map((o: object) => Array.from(Object.keys(o))).flat() ))
+
+  const csvString = `data:text/csv;chatset=utf-8,${encodeURIComponent(
+    [headers, ...exportData.map((item: { [key: string]: string | object | number | undefined }) => {
+      let i : string[] = []
+      for(let h of headers){
+        i.push(JSON.stringify(item?.[h] || ''))
+      }
+      return i.map(str => `"${str.replace(/"/g, '\"')}"`)
+    })].map(e => e.join(",")).join("\n")
+
+  )}`;
+  const link = document.createElement("a");
+  link.href = csvString;
+  link.download = "editions.csv";
+
+  link.click();
+};
+
 export const getServerSideProps: GetServerSideProps = async context => {
   const session = await getSession(context);
   const token = await getToken({ req: context.req });
@@ -69,6 +90,22 @@ const zoomEmoji = (zoom: string) => {
   switch (zoom){
     case 'no': return '✅';
     case 'yes': return '🔎';
+    default: return '❓'
+  }
+}
+
+const notesEmoji = (zoom: string) => {
+  switch (zoom){
+    case 'true': return '📝';
+    case 'false': return '📄';
+    default: return '❓'
+  }
+}
+
+const titleEmoji = (zoom: string) => {
+  switch (zoom){
+    case 'true': return '✅';
+    case 'false': return '📛';
     default: return '❓'
   }
 }
@@ -138,7 +175,9 @@ export default function Home({
     zooms: {'': 0, 'no': 0, 'yes': 0},
     tiers: {Gold: 0, Silver: 0, Black: 0},
     backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0},
-    foregrounds: {white: 0, black: 0}
+    foregrounds: {white: 0, black: 0},
+    notes: {"true": 0, "false": 0},
+    titles: {"true": 0, "false": 0}
   })
 
   const { isLoading, authenticated, address } = useSession();
@@ -151,12 +190,14 @@ export default function Home({
     console.log(data);
     if(nftData){
       setStats(nftData.reduce((accum: any, x) => {
+        accum.notes[(!!x._notes).toString()] = accum.notes[(!!x._notes).toString()] ? accum.notes[(!!x._notes).toString()] + 1 : 1;
+        accum.titles[(!!x._title).toString()] = accum.titles[(!!x._title).toString()] ? accum.titles[(!!x._title).toString()] + 1 : 1;
         accum.zooms[zoomOrNot(x?._zoom || '')] = accum.zooms[zoomOrNot(x?._zoom || '')] ? accum.zooms[zoomOrNot(x?._zoom || '')] + 1 : 1;
         accum.tiers[x._tier] = accum.tiers[x._tier] ? accum.tiers[x._tier] + 1 : 1;
         accum.backgrounds[x._background] = accum.backgrounds[x._background] ? accum.backgrounds[x._background] + 1 : 1;
         accum.foregrounds[x._foreground] = accum.foregrounds[x._foreground] ? accum.foregrounds[x._foreground] + 1 : 1;
         return accum;
-      }, {zooms: {'': 0, 'no': 0, 'yes': 0}, tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
+      }, {notes: {"true": 0, "false": 0}, titles: {"true": 0, "false": 0}, zooms: {'': 0, 'no': 0, 'yes': 0}, tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
     }
   }, [nftData, data]);
 
@@ -195,7 +236,7 @@ export default function Home({
     
   }
 
-  const updateData = ({tid="", zoom="", t="", tr=""}) => {
+  const updateData = ({tid="", zoom="", t="", n="", tr=""}) => {
     setNftData(
       existingValues => (existingValues.map((ev) => {
           if (ev._id != tid){
@@ -205,7 +246,8 @@ export default function Home({
               ...ev,
               _zoom: zoom,
               _title: t,
-              _tier: tr
+              _tier: tr,
+              _notes: n,
             }
           }
         }))
@@ -226,8 +268,10 @@ export default function Home({
           <>
           <div style={{textAlign: 'center'}}>
           <div style={{display: 'flex'}}>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>ZOOMS<br /> {Object.entries(stats.zooms).map(([t,n]) => (<span key={`temoji_${t}`}>{zoomEmoji(t)} {n} </span>))} <br /></div>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TIERS<br /> {Object.entries(stats.tiers).map(([t,n]) => (<span key={`temoji_${t}`}>{tierEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>ZOOMS<br /> {Object.entries(stats.zooms).map(([t,n]) => (<span key={`zoom_emoji_${t}`}>{zoomEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TIERS<br /> {Object.entries(stats.tiers).map(([t,n]) => (<span key={`tier_emoji_${t}`}>{tierEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TITLES<br /> {Object.entries(stats.titles).map(([t,n]) => (<span key={`title_emoji_${t}`}>{titleEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>NOTES<br /> {Object.entries(stats.notes).map(([t,n]) => (<span key={`notes_emoji_${t}`}>{notesEmoji(t)} {n} </span>))} <br /></div>
             {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>BACKGROUNDS<br /> {Object.entries(stats.backgrounds).map(([t,n]) => (<span key={`bemoji_${t}`}>{backgroundEmoji(t)} {n} </span>))}<br /></div> */}
             {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>FOREGROUNDS<br /> {Object.entries(stats.foregrounds).map(([t,n]) => (<span key={`femoji_${t}`}>{foregroundEmoji(t)} {n} </span>))}</div> */}
           </div>
@@ -257,10 +301,11 @@ export default function Home({
               tier={info._tier}
               artist={info.artist}
               zoom_selected={info?._zoom || ''}
+              notes={info?._notes || ''}
               metadata={info._metadata}
               key={`preview_${info._id}`}
-              handler={(tid: string, zoom: string, t: string, tr:string) => {
-              updateData({tid, zoom, t, tr})
+              handler={(tid: string, zoom: string, n:string, t: string, tr:string) => {
+              updateData({tid, zoom, n, t, tr})
             }}></NFTPreviewZoom>
             </>
           )
@@ -268,7 +313,8 @@ export default function Home({
         {isConnected && address && authorized(address) &&
         <>
         
-        <button onClick={() => {exportData(nftData);}}>Export Data</button>
+        <button onClick={() => {exportData(nftData);}}>Export Data as JSON</button>
+        <button onClick={() => {exportCSV(nftData);}}>Export Data as CSV</button>
         <button onClick={() => {setNftData(JSON.parse(localStorage.getItem("editions") || JSON.stringify(nftData)))}}>Recover Session</button>
         <button onClick={() => {signOut();}} disabled={isSignoutLoading}>Sign Out</button>
         </>
