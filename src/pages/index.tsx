@@ -41,9 +41,9 @@ const exportCSV = (exportData: { [key: string]: string | object | number | undef
 
   const csvString = `data:text/csv;chatset=utf-8,${encodeURIComponent(
     [headers, ...exportData.map((item: { [key: string]: string | object | number | undefined }) => {
-      let i : string[] = []
+      let i : Array<string> = []
       for(let h of headers){
-        i.push(JSON.stringify(item?.[h] || ''))
+        i.push(typeof(item?.[h]) == 'object' || 'number' ? JSON.stringify(item?.[h]) : `${item?.[h] || ''}`)
       }
       return i.map(str => `"${str.replace(/"/g, '\\"')}"`)
     })].map(e => e.join(",")).join("\r\n")
