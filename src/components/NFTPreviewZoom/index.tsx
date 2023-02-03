@@ -134,7 +134,7 @@ const NFTPreviewZoom = ({
     <div key={`div4_${tokenId}`} className="image_block">
     <label key={`label5_${tokenId}`} htmlFor="notes">Notes</label><input key={`input5_${tokenId}`} name="notes" onChange={(e)=> {
       setNotesSelected(e.target.value);
-    }} value={notesSelected} />
+    }} value={notesSelected} style={{width: '70vw'}} />
     </div>
     
     <hr />

@@ -45,8 +45,8 @@ const exportCSV = (exportData: { [key: string]: string | object | number | undef
       for(let h of headers){
         i.push(JSON.stringify(item?.[h] || ''))
       }
-      return i.map(str => `"${str.replace(/"/g, '\"')}"`)
-    })].map(e => e.join(",")).join("\n")
+      return i.map(str => `"${str.replace(/"/g, '\\"')}"`)
+    })].map(e => e.join(",")).join("\r\n")
 
   )}`;
   const link = document.createElement("a");
@@ -305,7 +305,7 @@ export default function Home({
               metadata={info._metadata}
               key={`preview_${info._id}`}
               handler={(tid: string, zoom: string, n:string, t: string, tr:string) => {
-              updateData({tid, zoom, n, t, tr})
+              updateData({tid, zoom, t, n, tr})
             }}></NFTPreviewZoom>
             </>
           )
