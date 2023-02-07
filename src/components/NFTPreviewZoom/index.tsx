@@ -62,35 +62,35 @@ const NFTPreviewZoom = ({
   return (
     <>
     <h2 key={`h2_${tokenId}`}>{artist} # {tokenId}
-    <button onClick={()=>{
+    <button key={`${tokenId}_save`} onClick={()=>{
       updateToken({tid: tokenId, data: {_zoom: zoomSelected, _notes: notesSelected, _title: titleSelected, _tier: tierSelected}})
     }}>Save</button>
     </h2>
     <div key={`div1_${tokenId}`} className="image_block">
-      {metadata.attributes.map((a: any) => (<button key={`${a.trait_type}`} style={{lineHeight: 'initial'}}><small>{a.trait_type}</small><br />{a.value}</button>))}
+      {metadata.attributes.map((a: any) => (<button key={`${tokenId}_${a.trait_type}`} style={{lineHeight: 'initial'}}><small key={`small_${tokenId}_${a.trait_type}`}>{a.trait_type}</small><br key={`br_${tokenId}_${a.trait_type}`} />{a.value}</button>))}
     </div>
     <div key={`div2_${tokenId}`} className="image_block">
     {ZOOMS.map((zoom) => {
       
         return (
-          <div style={{position: 'relative', height:'50px', width:'50px', display: 'flex', justifyContent: 'flex-end', alignItems:'center', flexDirection:'column', textShadow: '0 0 3px black', color: '#f0f0f0'}} key={`${tokenId}_${zoom}`} onClick={()=>{setZoomSelected(zoom);}} className={(zoom == zoomSelected) ? 'selected' : ''}>
-          <div  key={`${tokenId}_imgdiv_${zoom}`}  style={{width: '50px', height: '50px', zIndex: -1, position: 'absolute', top:0, left:0}}  >
+          <div style={{position: 'relative', height:'50px', width:'50px', display: 'flex', justifyContent: 'flex-end', alignItems:'center', flexDirection:'column', textShadow: '0 0 3px black', color: '#f0f0f0'}} key={`${tokenId}_zoom_${zoom}`} onClick={()=>{setZoomSelected(zoom);}} className={(zoom == zoomSelected) ? 'selected' : ''}>
+          <div  key={`${tokenId}_imgdiv_zoom_${zoom}`}  style={{width: '50px', height: '50px', zIndex: -1, position: 'absolute', top:0, left:0}}  >
           <Image 
             src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artist}_${tokenId}_${zoom}_percent.jpg`} 
-            key={`${tokenId}_img_${zoom}`} 
+            key={`${tokenId}_img_zoom_${zoom}`} 
             alt={`${tokenId}_${zoom}`} 
             fill
             style={{objectFit:"cover"}}
             unoptimized
             />
           </div>
-          <span key={`${tokenId}_span_${zoom}`} >
+          <span key={`${tokenId}_zoom_span_${zoom}`} >
           {zoom}%</span>
           </div>
         )
        
     })}
-    <button style={{height: '50px', width:'50px', padding:'0px 0px'}} onClick={()=>{setZoomSelected('');}}><small>Clear</small></button>
+    <button key={`${tokenId}_zoom_clear`} style={{height: '50px', width:'50px', padding:'0px 0px'}} onClick={()=>{setZoomSelected('');}}><small>Clear</small></button>
     </div>
     {(zoomSelected != "") && 
     <Image 
@@ -98,6 +98,8 @@ const NFTPreviewZoom = ({
     alt={`${tokenId}_${zoomSelected}`} 
     width={500}
     height={500}
+    priority
+    unoptimized
     key={`img_${tokenId}`}
     />
   }
@@ -107,27 +109,39 @@ const NFTPreviewZoom = ({
       setTitle(e.target.value);
     }} value={title} />
     <label key={`label2_${tokenId}`} htmlFor="tier">Tier</label>
-    <select  key={`select2_${tokenId}`} name="tier" onChange={(e) => {
+    <select  key={`select2_${tokenId}`} defaultValue={tierSelected} name="tier" onChange={(e) => {
       setTier(e.target.value);
     }}>
-      <option key={`option2_1_${tokenId}`} value="Gold" selected={tierSelected == "Gold"}>Gold</option>
+      {/* <option key={`option2_1_${tokenId}`} value="Gold" selected={tierSelected == "Gold"}>Gold</option>
       <option key={`option2_2_${tokenId}`} value="Silver" selected={tierSelected == "Silver"}>Silver</option>
       <option key={`option2_3_${tokenId}`} value="Black" selected={tierSelected == "Black"}>Black</option>
-      <option key={`option2_4_${tokenId}`} value="" selected={tierSelected == ""}></option>
+      <option key={`option2_4_${tokenId}`} value="" selected={tierSelected == ""}></option> */}
+      <option key={`option2_1_${tokenId}`} value="Gold" >Gold</option>
+      <option key={`option2_2_${tokenId}`} value="Silver" >Silver</option>
+      <option key={`option2_3_${tokenId}`} value="Black" >Black</option>
+      <option key={`option2_4_${tokenId}`} value="" ></option>
     </select>
     
     <label key={`label4_${tokenId}`} htmlFor="background">Zoom</label>
-    <select key={`select4_${tokenId}`} name="background" onChange={(e) => {
+    <select key={`select4_${tokenId}`} defaultValue={zoomSelected} name="background" onChange={(e) => {
       setZoomSelected(e.target.value);
     }}>
-      <option key={`option4_1_${tokenId}`} value="100" selected={zoomSelected == "100"}>100%</option>
+      {/* <option key={`option4_1_${tokenId}`} value="100" selected={zoomSelected == "100"}>100%</option>
       <option key={`option4_2_${tokenId}`} value="95" selected={zoomSelected == "95"}>95%</option>
       <option key={`option4_3_${tokenId}`} value="90" selected={zoomSelected == "90"}>90%</option>
       <option key={`option4_4_${tokenId}`} value="85" selected={zoomSelected == "85"}>85%</option>
       <option key={`option4_5_${tokenId}`} value="80" selected={zoomSelected == "80"}>80%</option>
       <option key={`option4_6_${tokenId}`} value="75" selected={zoomSelected == "75"}>75%</option>
       <option key={`option4_7_${tokenId}`} value="70" selected={zoomSelected == "70"}>70%</option>
-      <option key={`option4_8_${tokenId}`} value="" selected={zoomSelected == ""}>?</option>
+      <option key={`option4_8_${tokenId}`} value="" selected={zoomSelected == ""}>?</option> */}
+      <option key={`option4_1_${tokenId}`} value="100" >100%</option>
+      <option key={`option4_2_${tokenId}`} value="95" >95%</option>
+      <option key={`option4_3_${tokenId}`} value="90" >90%</option>
+      <option key={`option4_4_${tokenId}`} value="85" >85%</option>
+      <option key={`option4_5_${tokenId}`} value="80" >80%</option>
+      <option key={`option4_6_${tokenId}`} value="75" >75%</option>
+      <option key={`option4_7_${tokenId}`} value="70" >70%</option>
+      <option key={`option4_8_${tokenId}`} value="" >?</option>
     </select>
     </div>
     <div key={`div4_${tokenId}`} className="image_block">
@@ -136,7 +150,7 @@ const NFTPreviewZoom = ({
     }} value={notesSelected} style={{width: '70vw'}} />
     </div>
     
-    <hr />
+    <hr key={`${tokenId}_hr`} />
     </>
   )
 };

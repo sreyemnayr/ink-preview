@@ -19,8 +19,12 @@ import { useSession, useSignOut } from "@randombits/use-siwe";
 
 import useSWR from 'swr'
 
-const fetcher = (...args: Parameters<typeof fetch>) => 
-    fetch(...args).then((res) => res.json());
+const fetcher = ({url, queryParams}: {url: string, queryParams: string}) => {
+  console.log(url);
+  console.log(queryParams);
+  return fetch(`${url}?${queryParams}`).then((res) => res.json());
+}
+  
   
 const inter = Inter({ subsets: ['latin'] })
 
@@ -137,6 +141,15 @@ const tierEmoji = (tier: string) => {
   }
 }
 
+const tierMax = (tier: string) => {
+  switch(tier){
+    case 'Gold': return 70;
+    case 'Silver': return 153;
+    case 'Black': return 210;
+    default: return 0;
+  }
+}
+
 const authorized = (address: string | undefined) => {
   if(!address){
     return false;
@@ -162,9 +175,14 @@ export default function Home({
   isConnected
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-  const { data, error } = useSWR('/api/editions', fetcher)
+  const [queryObj, setQueryObj] = useState({filter: {}, sort: 'artist'})
+  const [queryParams, setQueryParams] = useState('?sort=artist')
+  const { data, error } = useSWR({url: '/api/editions', queryParams}, fetcher)
 
   const [nftData, setNftData] = useState([] as typeof dataDefault)
+
+  const [filter, setFilter] = useState('')
+  const [filterBy, setFilterBy] = useState('')
 
   const [initialized, setInitialized] = useState(false);
   const [inView, setInView] = useState(-1)
@@ -172,7 +190,7 @@ export default function Home({
   const [viewIndex, setViewIndex] = useState(['1'])
 
   const [stats, setStats] = useState({
-    zooms: {'': 0, 'no': 0, 'yes': 0},
+    zooms: {'no': 0, 'yes': 0, '': 0},
     tiers: {Gold: 0, Silver: 0, Black: 0},
     backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0},
     foregrounds: {white: 0, black: 0},
@@ -197,7 +215,7 @@ export default function Home({
         accum.backgrounds[x._background] = accum.backgrounds[x._background] ? accum.backgrounds[x._background] + 1 : 1;
         accum.foregrounds[x._foreground] = accum.foregrounds[x._foreground] ? accum.foregrounds[x._foreground] + 1 : 1;
         return accum;
-      }, {notes: {"true": 0, "false": 0}, titles: {"true": 0, "false": 0}, zooms: {'': 0, 'no': 0, 'yes': 0}, tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
+      }, {notes: {"true": 0, "false": 0}, titles: {"true": 0, "false": 0}, zooms: {'no': 0, 'yes': 0, '': 0}, tiers: {Gold: 0, Silver: 0, Black: 0}, backgrounds: {fire: 0, earth: 0, water: 0, clouds: 0}, foregrounds: {white: 0, black: 0}}))
     }
   }, [nftData, data]);
 
@@ -236,6 +254,42 @@ export default function Home({
     
   }
 
+  useEffect(()=> {
+    console.log("filter", filter);
+    console.log("filterBy", filterBy);
+  }, [filter, filterBy])
+
+  useEffect(() => {
+    console.log("queryObj", queryObj);
+    setQueryParams(new URLSearchParams({filter: JSON.stringify(queryObj.filter), sort: queryObj.sort}).toString())
+    setInView(0)
+  }, [queryObj])
+
+  const updateQueryParams = (new_parameter: {filter?: {}, sort?: string}) => {
+    if(!!new_parameter?.filter){
+      setFilterBy(Object.keys(new_parameter?.filter)[0]);
+    }
+    if(!!new_parameter?.filter && !!new_parameter?.sort){
+      setQueryObj((ev)=>({...ev, ...new_parameter}))
+    }
+    else if(!!new_parameter?.filter){
+      setQueryObj(
+        existingValues => ({
+          ...existingValues,
+          filter: new_parameter.filter || {}
+        })
+      )
+    }
+    else if(!!new_parameter?.sort){
+      setQueryObj(
+        existingValues => ({
+          ...existingValues,
+          sort: new_parameter.sort || ''
+        })
+      )
+    }
+  }
+
   const updateData = ({tid="", zoom="", t="", n="", tr=""}) => {
     setNftData(
       existingValues => (existingValues.map((ev) => {
@@ -268,10 +322,72 @@ export default function Home({
           <>
           <div style={{textAlign: 'center'}}>
           <div style={{display: 'flex'}}>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>ZOOMS<br /> {Object.entries(stats.zooms).map(([t,n]) => (<span key={`zoom_emoji_${t}`}>{zoomEmoji(t)} {n} </span>))} <br /></div>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TIERS<br /> {Object.entries(stats.tiers).map(([t,n]) => (<span key={`tier_emoji_${t}`}>{tierEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>ZOOMS<br /> {Object.entries(stats.zooms).map(([t,n]) => (
+            <span 
+            style={{
+              fontWeight: filterBy === '_zoom' && filter === t ? 'bold' : '',
+              border: filterBy === '_zoom' && filter === t ? '1px dashed black' : ''
+            }}
+            onClick={
+              ()=>{
+                console.log(filter, filterBy)
+                if(filterBy !== '_zoom' || filter !== t){
+                  setFilter(t);
+                  updateQueryParams({filter: {_zoom: t === "no" ? "100" : t === "yes" ? {$exists: true, $ne: "100"} :  {$not: {$regex: "\d*"}}}})
+                } else {
+                  setFilter('');
+                  updateQueryParams({filter: {_id: {$exists: true}}})
+                }
+                
+                }
+              }
+            key={`zoom_emoji_${t}`}>{zoomEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TIERS<br /> {Object.entries(stats.tiers).map(([t,n]) => (
+            <span
+            style={{
+              fontWeight: filterBy === '_tier' && filter === t ? 'bold' : '',
+              border: filterBy === '_tier' && filter === t ? '1px dashed black' : ''
+            }}
+            onClick={
+              ()=>{
+                console.log(filter, filterBy)
+                if(filterBy !== '_tier' || filter !== t){
+                  setFilter(t);
+                  updateQueryParams({filter: {_tier: t}})
+                } else {
+                  setFilter('');
+                  updateQueryParams({filter: {_id: {$exists: true}}})
+                }
+                
+                }
+              }
+             key={`tier_emoji_${t}`}>{tierEmoji(t)} {n}/{tierMax(t)} </span>))} <br /></div>
             <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>TITLES<br /> {Object.entries(stats.titles).map(([t,n]) => (<span key={`title_emoji_${t}`}>{titleEmoji(t)} {n} </span>))} <br /></div>
-            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>NOTES<br /> {Object.entries(stats.notes).map(([t,n]) => (<span key={`notes_emoji_${t}`}>{notesEmoji(t)} {n} </span>))} <br /></div>
+            <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>
+              NOTES <br />
+              {Object.entries(stats.notes).map(([t,n]) => (
+                <span 
+                  key={`notes_emoji_${t}`}
+                  style={{
+                    fontWeight: filterBy === '_notes' && filter === t ? 'bold' : '',
+                    border: filterBy === '_notes' && filter === t ? '1px dashed black' : ''
+                  }}
+                  onClick={
+                    ()=>{
+                      console.log(filter, filterBy)
+                      if(filterBy !== '_notes' || filter !== t){
+                        setFilter(t);
+                        updateQueryParams({filter: {_notes: t === "true" ? {$exists: true, $ne: ''} : {$not: {$exists: true, $ne: ''}}}})
+                      } else {
+                        setFilter('');
+                        updateQueryParams({filter: {_id: {$exists: true}}})
+                      }
+                      
+                      }
+                    }
+                  >{notesEmoji(t)} {n} </span>))}
+              <br />
+            </div>
             {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>BACKGROUNDS<br /> {Object.entries(stats.backgrounds).map(([t,n]) => (<span key={`bemoji_${t}`}>{backgroundEmoji(t)} {n} </span>))}<br /></div> */}
             {/* <div style={{border: '1px solid black', padding: '2px', margin: '2px'}}>FOREGROUNDS<br /> {Object.entries(stats.foregrounds).map(([t,n]) => (<span key={`femoji_${t}`}>{foregroundEmoji(t)} {n} </span>))}</div> */}
           </div>
@@ -282,7 +398,7 @@ export default function Home({
         }}>
           {nftData.map((info) => {
             return (
-              <option key={`opt_${info._id}`} value={info._id}>{info.artist} # {info._id} - {info._title} {tierEmoji(info._tier)}{backgroundEmoji(info._background)}{foregroundEmoji(info._foreground)}{zoomEmoji(zoomOrNot(info?._zoom || ''))}</option>
+              <option key={`opt_id_${info._id}`} value={info._id}>{info.artist} # {info._id} - {info._title} {tierEmoji(info._tier)}{backgroundEmoji(info._background)}{foregroundEmoji(info._foreground)}{zoomEmoji(zoomOrNot(info?._zoom || ''))}</option>
             )
           }) }
         </select>
