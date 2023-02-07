@@ -76,7 +76,7 @@ const NFTPreviewZoom = ({
           <div style={{position: 'relative', height:'50px', width:'50px', display: 'flex', justifyContent: 'flex-end', alignItems:'center', flexDirection:'column', textShadow: '0 0 3px black', color: '#f0f0f0'}} key={`${tokenId}_${zoom}`} onClick={()=>{setZoomSelected(zoom);}} className={(zoom == zoomSelected) ? 'selected' : ''}>
           <div  key={`${tokenId}_imgdiv_${zoom}`}  style={{width: '50px', height: '50px', zIndex: -1, position: 'absolute', top:0, left:0}}  >
           <Image 
-            src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${artist}_${tokenId}_${zoom}_percent.jpg`} 
+            src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artist}_${tokenId}_${zoom}_percent.jpg`} 
             key={`${tokenId}_img_${zoom}`} 
             alt={`${tokenId}_${zoom}`} 
             fill
@@ -94,7 +94,7 @@ const NFTPreviewZoom = ({
     </div>
     {(zoomSelected != "") && 
     <Image 
-    src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${artist}_${tokenId}_${zoomSelected}_percent.jpg`} 
+    src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artist}_${tokenId}_${zoomSelected}_percent.jpg`} 
     alt={`${tokenId}_${zoomSelected}`} 
     width={500}
     height={500}

@@ -9,6 +9,12 @@ const nextConfig = {
         port: '',
         pathname: '/previews/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'https://d331ancnbhe3hg.cloudfront.net',
+        port: '',
+        pathname: '/previews/**',
+      },
     ],
   },
   env: {
