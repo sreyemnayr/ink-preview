@@ -81,8 +81,7 @@ const NFTPreviewZoom = ({
             alt={`${tokenId}_${zoom}`} 
             fill
             style={{objectFit:"cover"}}
-          
-            
+            unoptimized
             />
           </div>
           <span key={`${tokenId}_span_${zoom}`} >
