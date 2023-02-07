@@ -11,7 +11,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'https://d331ancnbhe3hg.cloudfront.net',
+        hostname: 'd331ancnbhe3hg.cloudfront.net',
         port: '',
         pathname: '/previews/**',
       },

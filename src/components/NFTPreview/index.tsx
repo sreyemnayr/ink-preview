@@ -77,7 +77,7 @@ const NFTPreview = ({
         FOREGROUNDS.map((fg) => {
           return (
           <Image 
-            src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${tokenId}_${artist}_${bg}_${fg}.jpg`} 
+            src={`https://d331ancnbhe3hg.cloudfront.net/previews/${tokenId}_${artist}_${bg}_${fg}.jpg`} 
             key={`${tokenId}_${bg}_${fg}`}
             alt={`${tokenId}_${bg}_${fg}`} 
             width={50}
@@ -93,7 +93,7 @@ const NFTPreview = ({
     </div>
     {(bgSelected != "" && fgSelected != "") && 
     <Image 
-    src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${tokenId}_${artist}_${bgSelected}_${fgSelected}.jpg`} 
+    src={`https://d331ancnbhe3hg.cloudfront.net/previews/${tokenId}_${artist}_${bgSelected}_${fgSelected}.jpg`} 
     alt={`${tokenId}_${bgSelected}_${fgSelected}`} 
     width={500}
     height={500}
@@ -102,7 +102,7 @@ const NFTPreview = ({
   }
   {(bgSelected == "" && fgSelected == "") && false && 
     <Image 
-    src={`http://ink-preview.s3-website.us-east-2.amazonaws.com/previews/${tokenId}_${artist}_clouds_black.jpg`} 
+    src={`https://d331ancnbhe3hg.cloudfront.net/previews/${tokenId}_${artist}_clouds_black.jpg`} 
     alt={`${tokenId}_${bgSelected}_${fgSelected}`} 
     width={500}
     height={500}
