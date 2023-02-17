@@ -14,7 +14,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import dataDefault from '@/data/editions.json'
 
-import NFTPreviewZoom from '@/components/NFTPreviewZoom'
+import NFTPreviewRenders from '@/components/NFTPreviewRenders'
 import { useSession, useSignOut } from "@randombits/use-siwe";
 
 import useSWR from 'swr'
@@ -411,18 +411,18 @@ export default function Home({
           isConnected && address && authorized(address) && nftData.filter((info) => info._id == viewIndex[inView]).map((info) => {
           return(
             <>
-            <NFTPreviewZoom 
+            <NFTPreviewRenders 
               title={info._title}
               tokenId={info._id}
-              tier={info._tier}
+              tier={info._tier as 'Gold' | 'Silver' | 'Black'}
               artist={info.artist}
-              zoom_selected={info?._zoom || ''}
+              
               notes={info?._notes || ''}
               metadata={info._metadata}
               key={`preview_${info._id}`}
-              handler={(tid: string, zoom: string, n:string, t: string, tr:string) => {
-              updateData({tid, zoom, t, n, tr})
-            }}></NFTPreviewZoom>
+              handler={(tid: string, n:string, t: string, tr:string) => {
+              updateData({tid, t, n, tr})
+            }}></NFTPreviewRenders>
             </>
           )
         })}
