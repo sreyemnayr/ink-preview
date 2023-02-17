@@ -92,7 +92,7 @@ const NFTPreviewRenders = ({
         <source src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webm`}  type="video/webm" />
     </video>
 
-    <h2>Composite (webp)</h2>
+    <h2>Composite (<a key={`video_dl_${artIdSelected}`} href={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webp`}>webp</a>)</h2>
     <Image 
     src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webp`} 
     alt={`${tokenId}_${editionSelected}`} 
