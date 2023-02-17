@@ -87,12 +87,12 @@ const NFTPreviewRenders = ({
     </div>
     {(editionSelected != 0) && 
     <>
-    <h2>Video (webm)</h2>
+    <h2>Video (<a key={`video_dl_${artIdSelected}`} href={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webm`}>webm</a>)</h2>
     <video autoPlay playsInline muted loop id="poppetBg" key={`video_${artIdSelected}`} style={{height:'1500px', width:'1500px'}}>
         <source src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webm`}  type="video/webm" />
     </video>
 
-    <h2>Composite (<a key={`video_dl_${artIdSelected}`} href={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webp`}>webp</a>)</h2>
+    <h2>Composite (<a key={`webp_dl_${artIdSelected}`} href={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webp`}>webp</a>)</h2>
     <Image 
     src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.webp`} 
     alt={`${tokenId}_${editionSelected}`} 
@@ -103,7 +103,7 @@ const NFTPreviewRenders = ({
     key={`img_${artIdSelected}`}
     />
     
-    <h2>Transparent (png)</h2>
+    <h2>Transparent (<a key={`transparent_dl_${artIdSelected}`} href={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.png`}>png</a>)</h2>
     <Image 
     src={`https://d331ancnbhe3hg.cloudfront.net/previews/${artIdSelected}.png`} 
     alt={`${tokenId}_${editionSelected}`} 
